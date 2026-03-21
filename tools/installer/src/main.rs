@@ -1,5 +1,5 @@
 // installs das and dvm binaries to the appropriate system location
-// and, on windows, adds that location to the user PATH
+// and, on windows, adds that location to PATH
 
 use std::path::{Path, PathBuf};
 
@@ -51,7 +51,6 @@ fn self_dir() -> PathBuf {
         .to_path_buf()
 }
 
-// platform-specific binary filename
 fn src_bin(dir: &Path, name: &str) -> PathBuf {
     #[cfg(target_os = "windows")]
     return dir.join(format!("{name}.exe"));
@@ -100,24 +99,49 @@ fn windows_dest() -> PathBuf {
     PathBuf::from(base).join("Delta-VM")
 }
 
-// adds dest to the current user PATH via the registry (persists across sessions)
+// returns true if the process has admin privileges
+#[cfg(target_os = "windows")]
+fn is_admin() -> bool {
+    // "net session" succeeds only when running as administrator
+    std::process::Command::new("net")
+        .args(["session"])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+}
+
+// adds dest to PATH in the registry
+// - admin: HKLM system PATH (visible to all users, matches Program Files install)
+// - non-admin: HKCU user PATH
 #[cfg(target_os = "windows")]
 fn windows_add_to_path(dest: &Path) {
     let dest_str = dest.to_string_lossy().to_string();
 
-    // read current user PATH from registry
+    let (reg_key, path_type) = if is_admin() {
+        (r"HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment", "system")
+    } else {
+        (r"HKCU\Environment", "user")
+    };
+
+    // read current PATH from the chosen key
     let output = std::process::Command::new("reg")
-        .args(["query", r"HKCU\Environment", "/v", "PATH"])
+        .args(["query", reg_key, "/v", "PATH"])
         .output();
 
     let current = match output {
         Ok(o) if o.status.success() => {
             let raw = String::from_utf8_lossy(&o.stdout).to_string();
-            // reg query output: "    PATH    REG_SZ    <value>"
             raw.lines()
                 .find(|l| l.trim_start().starts_with("PATH"))
-                .and_then(|l| l.splitn(3, "REG_SZ").nth(1))
-                .map(|v| v.trim().to_string())
+                .and_then(|l| {
+                    let after = l.splitn(2, "PATH").nth(1)?;
+                    after
+                        .split_once("REG_EXPAND_SZ")
+                        .or_else(|| after.split_once("REG_SZ"))
+                        .map(|(_, v)| v.trim().to_string())
+                })
                 .unwrap_or_default()
         }
         _ => String::new(),
@@ -136,11 +160,11 @@ fn windows_add_to_path(dest: &Path) {
     };
 
     let status = std::process::Command::new("reg")
-        .args(["add", r"HKCU\Environment", "/v", "PATH", "/t", "REG_EXPAND_SZ", "/d", &new_path, "/f"])
+        .args(["add", reg_key, "/v", "PATH", "/t", "REG_EXPAND_SZ", "/d", &new_path, "/f"])
         .status();
 
     match status {
-        Ok(s) if s.success() => println!("Added to PATH: {dest_str}"),
-        _ => eprintln!("warning: could not update PATH in registry - add {dest_str} manually"),
+        Ok(s) if s.success() => println!("Added to {path_type} PATH: {dest_str}"),
+        _ => eprintln!("warning: could not update PATH - add {dest_str} manually"),
     }
 }
