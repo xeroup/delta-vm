@@ -927,3 +927,178 @@ skip
     }
 }
 
+#[cfg(test)]
+mod bool_tests {
+    use super::*;
+    use crate::ast::*;
+
+    #[test]
+    fn test_bool_parses_as_type() {
+        let src = r#"
+.func ok() -> bool
+    bool r0
+    load r0, 1
+    ret r0
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        assert_eq!(prog.funcs[0].ret_type, Type::Bool);
+        assert_eq!(prog.funcs[0].locals[0].ty, Type::Bool);
+    }
+
+    #[test]
+    fn test_bool_param_parses() {
+        let src = r#"
+.func ok(bool r0) -> bool
+    ret r0
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        assert_eq!(prog.funcs[0].params[0].ty, Type::Bool);
+    }
+
+    #[test]
+    fn test_bool_no_checker_errors() {
+        let src = r#"
+.func ok() -> bool
+    bool r0
+    load r0, 1
+    ret r0
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "bool func should pass checker: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_compat_with_int_param() {
+        // passing bool to int param and vice versa should pass
+        let src = r#"
+.func takes_int(int r0) -> int
+    ret r0
+.endfunc
+
+.func caller() -> int
+    bool b
+    int r
+    load b, 1
+    call r, takes_int, b
+    ret r
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "bool->int compat should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_int_compat_with_bool_param() {
+        let src = r#"
+.func takes_bool(bool r0) -> bool
+    ret r0
+.endfunc
+
+.func caller() -> bool
+    int n
+    bool r
+    load n, 0
+    call r, takes_bool, n
+    ret r
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "int->bool compat should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_ret_compat_with_int_ret() {
+        // function declared -> bool, returning int register
+        let src = r#"
+.func ok() -> bool
+    int r0
+    load r0, 0
+    ret r0
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "int ret in bool func should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_comparison_dst() {
+        // comparison result into bool register should pass
+        let src = r#"
+.func ok(int r0) -> bool
+    bool result
+    gt result, r0, 0
+    ret result
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "comparison into bool should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_arithmetic() {
+        // bool + bool should work like int + int
+        let src = r#"
+.func ok(bool r0, bool r1) -> bool
+    bool r2
+    add r2, r0, r1
+    ret r2
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "bool arithmetic should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_bitwise() {
+        let src = r#"
+.func ok(bool r0, bool r1) -> bool
+    bool r2
+    and r2, r0, r1
+    ret r2
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "bool bitwise should pass: {:?}", errors);
+    }
+
+    #[test]
+    fn test_bool_float_mismatch_fails() {
+        // bool and float should still be incompatible
+        let src = r#"
+.func bad(bool r0, float r1) -> bool
+    bool r2
+    add r2, r0, r1
+    ret r2
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(!errors.is_empty(), "bool+float should fail");
+    }
+
+    #[test]
+    fn test_bool_load_int_literal() {
+        // loading an int literal (0 or 1) into a bool register should pass
+        let src = r#"
+.func ok() -> bool
+    bool r0
+    load r0, 0
+    ret r0
+.endfunc
+"#;
+        let prog = parse(src).unwrap();
+        let (errors, _) = analyze(&prog);
+        assert!(errors.is_empty(), "loading int literal into bool should pass: {:?}", errors);
+    }
+}
+

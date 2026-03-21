@@ -3,6 +3,7 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     Int,
+    Bool,
     Float,
     Char,
     Ptr,

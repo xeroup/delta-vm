@@ -8,7 +8,7 @@ The primary goal is to provide a small, hackable target platform for experimenti
 ### Features
 
 - **Register-based VM** - fixed-width 64-bit registers, simple 4-format instruction encoding
-- **Typed assembly** (`int`, `float`, `char`, `ptr`) with a static checker and linter
+- **Typed assembly** (`int`, `bool`, `float`, `char`, `ptr`) with a static checker and linter
 - **Native code generation** - Cranelift backend emits optimised machine code for x86-64 and arm64
 - **System linker** - `--emit exe` produces a runnable binary using the system `cc`/`ld` (no external toolchain to install separately)
 - **Disassembler** - `das` reconstructs human-readable assembly from `.dc` bytecode, with resolved jump labels and inline data comments
@@ -18,12 +18,12 @@ The primary goal is to provide a small, hackable target platform for experimenti
 ### Crate layout
 
 ```
-delta-format/      binary format, opcode table, instruction encoding/decoding
-delta-asm/         lexer -> parser -> AST -> checker -> linter -> resolver
-delta-codegen/     AST -> .dc bytecode
-delta-cranelift/   .dc -> Cranelift IR -> native object/exe
-tools/dvm/         interpreter + compile driver
-tools/das/         disassembler
+delta-format/ binary format, opcode table, instruction encoding/decoding
+delta-asm/ lexer -> parser -> AST -> checker -> linter -> resolver
+delta-codegen/ AST -> .dc bytecode
+delta-cranelift/ .dc -> Cranelift IR -> native object/exe
+tools/dvm/ interpreter + compile driver
+tools/das/ disassembler
 ```
 
 
@@ -90,9 +90,9 @@ dvm program.ds --entry main --bench
 
 # disassemble bytecode
 das program.dc
-das program.ds --hex        # show raw bytes alongside mnemonics
-das program.dc --info       # file summary only
-das program.dc -f main      # one function only
+das program.ds --hex # show raw bytes alongside mnemonics
+das program.dc --info # file summary only
+das program.dc -f main # one function only
 ```
 
 
@@ -105,17 +105,17 @@ das program.dc -f main      # one function only
     int r1
     int r2
     int r3
-    load  r1, 2
-    lt    r2, r0, r1
+    load r1, 2
+    lt r2, r0, r1
     jmpif r2, base
-    load  r1, 1
-    sub   r2, r0, r1
-    call  r3, fib, r2
-    load  r1, 2
-    sub   r2, r0, r1
-    call  r1, fib, r2
-    add   r1, r3, r1
-    ret   r1
+    load r1, 1
+    sub r2, r0, r1
+    call r3, fib, r2
+    load r1, 2
+    sub r2, r0, r1
+    call r1, fib, r2
+    add r1, r3, r1
+    ret r1
 base
     ret r0
 .endfunc
@@ -123,11 +123,11 @@ base
 .func main() -> int
     int r0
     int r1
-    load     r0, 10
-    call     r1, fib, r0
+    load r0, 10
+    call r1, fib, r0
     printint r1
-    load     r0, 0
-    ret      r0
+    load r0, 0
+    ret r0
 .endfunc
 ```
 

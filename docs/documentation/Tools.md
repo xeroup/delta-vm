@@ -89,25 +89,25 @@ das program.ds
 ; delta bytecode - 2 function(s)
 ;
 ; data:
-;   [0] str  "Hello, world!\n"
+; [0] str "Hello, world!\n"
 
 fn main (regs=2, params=0):
-  0000:  load.p         r0, data[0]  ; "Hello, world!\n"
-  0008:  print.p        r0
-  000c:  load.i         r1, 0
-  0014:  ret            r1
+  0000: load.p r0, data[0] ; "Hello, world!\n"
+  0008: print.p r0
+  000c: load.i r1, 0
+  0014: ret r1
 ```
 
 Jump targets are resolved to labels:
 
 ```
 fn fib (regs=4, params=1):
-  0000:  load.i         r1, 2
-  0008:  lt.i           r2, r0, r1
-  000c:  jmp.if         r2, .L11  ; 0x004c
+  0000: load.i r1, 2
+  0008: lt.i r2, r0, r1
+  000c: jmp.if r2, .L11 ; 0x004c
   ...
   .L11:
-  004c:  ret            r0
+  004c: ret r0
 ```
 
 ---

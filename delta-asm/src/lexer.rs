@@ -10,6 +10,7 @@ pub enum Token {
 
     // types
     TyInt,
+    TyBool,
     TyFloat,
     TyChar,
     TyPtr,
@@ -182,21 +183,22 @@ impl<'a> Lexer<'a> {
 
     fn keyword_or_ident(s: String) -> Token {
         match s.as_str() {
-            ".func"    => Token::Func,
+            ".func" => Token::Func,
             ".endfunc" => Token::Endfunc,
-            ".extern"  => Token::Extern,
+            ".extern" => Token::Extern,
             ".section" => Token::Section,
-            ".str"     => Token::DirStr,
-            ".i64"     => Token::DirI64,
-            "int"      => Token::TyInt,
-            "float"    => Token::TyFloat,
-            "char"     => Token::TyChar,
-            "ptr"      => Token::TyPtr,
-            "void"     => Token::TyVoid,
-            "ret"      => Token::Ident("ret".into()),
-            "code"     => Token::SecCode,
-            "data"     => Token::SecData,
-            _          => Token::Ident(s),
+            ".str" => Token::DirStr,
+            ".i64" => Token::DirI64,
+            "int" => Token::TyInt,
+            "bool" => Token::TyBool,
+            "float" => Token::TyFloat,
+            "char" => Token::TyChar,
+            "ptr" => Token::TyPtr,
+            "void" => Token::TyVoid,
+            "ret" => Token::Ident("ret".into()),
+            "code" => Token::SecCode,
+            "data" => Token::SecData,
+            _ => Token::Ident(s),
         }
     }
 

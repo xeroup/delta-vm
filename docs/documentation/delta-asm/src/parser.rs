@@ -53,11 +53,12 @@ impl Parser {
     fn parse_type(&mut self) -> Result<Type> {
         let span = self.span();
         match self.advance() {
-            Token::TyInt   => Ok(Type::Int),
+            Token::TyInt => Ok(Type::Int),
+            Token::TyBool => Ok(Type::Bool),
             Token::TyFloat => Ok(Type::Float),
-            Token::TyChar  => Ok(Type::Char),
-            Token::TyPtr   => Ok(Type::Ptr),
-            Token::TyVoid  => Ok(Type::Void),
+            Token::TyChar => Ok(Type::Char),
+            Token::TyPtr => Ok(Type::Ptr),
+            Token::TyVoid => Ok(Type::Void),
             Token::Ident(s) => Err(AsmError::UnknownType(s, span)),
             t => Err(AsmError::UnexpectedToken(format!("{:?}", t), span)),
         }
@@ -392,7 +393,7 @@ impl Parser {
                 Token::Endfunc | Token::Eof => break,
 
                 // local register declaration
-                Token::TyInt | Token::TyFloat | Token::TyChar | Token::TyPtr => {
+                Token::TyInt | Token::TyBool | Token::TyFloat | Token::TyChar | Token::TyPtr => {
                     let ty = self.parse_type()?;
                     let name = self.expect_ident()?;
                     locals.push(Register { name, ty });

@@ -9,7 +9,7 @@ The language is intentionally minimal: it sits one level above raw bytecode, giv
 ### Design principles
 
 - **Register-based.** All values live in named registers. There is no stack.
-- **Explicitly typed.** Every register has a declared type: `int`, `float`, `char`, or `ptr`. The assembler enforces types statically.
+- **Explicitly typed.** Every register has a declared type: `int`, `bool`, `float`, `char`, or `ptr`. The assembler enforces types statically. `bool` is an alias for `int` (0/1) and is interchangeable with it.
 - **Flat.** Functions cannot be nested. Labels are local to their function. There is no module system.
 - **No implicit behaviour.** Arithmetic does not coerce types. Passing a `float` register where `int` is expected is an error at assemble time.
 - **Immediates anywhere.** Any source operand may be a literal - the assembler generates the necessary load automatically.
@@ -45,25 +45,25 @@ The language is intentionally minimal: it sits one level above raw bytecode, giv
 ```
 source.ds
     |
-    ▼
+    v
   Lexer        tokenise text into tokens
     |
-    ▼
+    v
   Parser       build AST (FuncDecl, Instruction, Operand, ...)
     |
-    ▼
+    v
   Resolver     resolve labels -> byte offsets, data names -> indices
     |
-    ▼
+    v
   Checker      static type checking of register usage and call signatures
     |
-    ▼
+    v
   Linter       warnings: unused registers, unreachable code after jmp/ret
     |
-    ▼
+    v
   Codegen      emit .dc bytecode
     |
-    ▼
+    v
   dvm / Cranelift   interpret or compile to native
 ```
 

@@ -13,10 +13,10 @@
 .func main() -> int
     ptr r0
     int r1
-    load      r0, @msg
-    printptr  r0
-    load      r1, 0
-    ret       r1
+    load r0, @msg
+    printptr r0
+    load r1, 0
+    ret r1
 .endfunc
 ```
 
@@ -30,14 +30,14 @@
 .func fib(int r0) -> int
     int r1
     int r2
-    lt    r2, r0, 2
+    lt r2, r0, 2
     jmpif r2, base
-    sub   r1, r0, 1
-    call  r1, fib, r1
-    sub   r2, r0, 2
-    call  r2, fib, r2
-    add   r1, r1, r2
-    ret   r1
+    sub r1, r0, 1
+    call r1, fib, r1
+    sub r2, r0, 2
+    call r2, fib, r2
+    add r1, r1, r2
+    ret r1
 base
     ret r0
 .endfunc
@@ -45,10 +45,10 @@ base
 .func main() -> int
     int r0
     int r1
-    load     r0, 10
-    call     r1, fib, r0
+    load r0, 10
+    call r1, fib, r0
     printint r1
-    ret      r1
+    ret r1
 .endfunc
 ```
 
@@ -68,11 +68,11 @@ Source operands can be literals directly:
     load r1, 0
     load r2, 1
 loop
-    gt    r3, r2, r0
+    gt r3, r2, r0
     jmpif r3, done
-    add   r1, r1, r2
-    add   r2, r2, 1    ; immediate operand
-    jmp   loop
+    add r1, r1, r2
+    add r2, r2, 1
+    jmp loop
 done
     ret r1
 .endfunc
@@ -80,10 +80,10 @@ done
 .func main() -> int
     int r0
     int r1
-    load     r0, 100
-    call     r1, sum_to, r0
-    printint r1        ; 5050
-    ret      r1
+    load r0, 100
+    call r1, sum_to, r0
+    printint r1 ; 5050
+    ret r1
 .endfunc
 ```
 
@@ -120,20 +120,20 @@ Functions can be stored in `ptr` registers and called indirectly:
     int r
 
     func.ptr fp, double
-    call     r, apply, fp, 7
-    printint r          ; 14
+    call r, apply, fp, 7
+    printint r ; 14
 
     func.ptr fp, triple
-    call     r, apply, fp, 7
-    printint r          ; 21
+    call r, apply, fp, 7
+    printint r ; 21
 
     ; direct indirect call
     func.ptr fp, double
     call.ptr r, fp, 5
-    printint r          ; 10
+    printint r ; 10
 
     load r, 0
-    ret  r
+    ret r
 .endfunc
 ```
 
@@ -155,19 +155,18 @@ Functions can be stored in `ptr` registers and called indirectly:
     int r
 
     load f, @fmt
-    load s, @fmt        ; reuse as placeholder
+    load s, @fmt
     load n, 42
 
     call.ext.void printf, f, s, n
 
     load r, 0
-    ret  r
+    ret r
 .endfunc
 ```
 
 ```sh
 $ dvm program.ds --entry main
-%s has %d items
  has 42 items
 ```
 
@@ -189,7 +188,7 @@ A more complete example with multiple format specifiers:
     load a, 3
     load b, 4
     load c, 7
-    call.ext.void printf, f, a, b, c   ; 3 + 4 = 7
+    call.ext.void printf, f, a, b, c ; 3 + 4 = 7
     ret a
 .endfunc
 ```
@@ -208,10 +207,10 @@ A more complete example with multiple format specifiers:
     int r2
     ptr msg
     arr.len r2, r0
-    lt      r2, r1, r2
-    jmpif   r2, ok
-    load    msg, @err_oob
-    panic   msg
+    lt r2, r1, r2
+    jmpif r2, ok
+    load msg, @err_oob
+    panic msg
 ok
     arr.get r2, r0, r1
     ret r2
@@ -221,13 +220,13 @@ ok
     ptr arr
     int v
     arr.new arr, 5
-    load    v, 0
+    load v, 0
     arr.set arr, 0, v
-    load    v, 99
+    load v, 99
     arr.set arr, 4, v
 
     call v, safe_get, arr, 4
-    printint v          ; 99
+    printint v ; 99
 
     arr.free arr
     ret v
@@ -252,20 +251,20 @@ ok
 
     load i, 0
 fill
-    lt       v, i, len
+    lt v, i, len
     jmpifnot v, done
-    mul      v, i, i
-    arr.set  arr, i, v
-    add      i, i, 1
-    jmp      fill
+    mul v, i, i
+    arr.set arr, i, v
+    add i, i, 1
+    jmp fill
 
 done
-    load    i, 5
+    load i, 5
     arr.get v, arr, i
-    printint v          ; 25
+    printint v ; 25
     arr.free arr
     load i, 0
-    ret  i
+    ret i
 .endfunc
 ```
 
@@ -282,17 +281,17 @@ done
     int r
 
     load flags, 0
-    or   flags, flags, 8    ; set bit 3
-    and  r, flags, 8
-    printint r              ; 8
+    or flags, flags, 8 ; set bit 3
+    and r, flags, 8
+    printint r ; 8
 
-    xor  flags, flags, 8    ; clear bit 3
-    and  r, flags, 8
-    printint r              ; 0
+    xor flags, flags, 8 ; clear bit 3
+    and r, flags, 8
+    printint r ; 0
 
     load r, 7
-    shl  r, r, 2
-    printint r              ; 28
+    shl r, r, 2
+    printint r ; 28
 
     ret r
 .endfunc
@@ -309,13 +308,13 @@ done
     int n
     ptr line
 
-    readint  n
+    readint n
     readline line
 
-    mul      n, n, 2
+    mul n, n, 2
     printint n
     printptr line
-    free     line
+    free line
 
     ret n
 .endfunc
@@ -331,16 +330,16 @@ $ printf "21\nhello\n" | dvm input.ds --entry main
 ### Native compilation
 
 ```sh
-# Interpret
+# interpret
 dvm program.ds --entry main
 
-# Compile to native executable (no external linker needed)
+# compile to native executable (no external linker needed)
 dvm program.ds --entry main --compile --emit exe -o program
 ./program
 
-# Other emit targets
-dvm program.ds --entry main --compile --emit asm  # assembly
-dvm program.ds --entry main --compile --emit obj  # object file
+# other emit targets
+dvm program.ds --entry main --compile --emit asm
+dvm program.ds --entry main --compile --emit obj
 ```
 
 Native binaries typically run 10-25x faster than the interpreter for compute-intensive code.

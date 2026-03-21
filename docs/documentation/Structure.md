@@ -14,7 +14,7 @@ A `.ds` file is plain UTF-8 text. Lines are significant: most constructs are one
 ; optional data section
 .section data
     .str greeting "Hello, world!\n"
-    .i64 answer   42
+    .i64 answer 42
 
 ; optional code section marker (may be omitted)
 .section code
@@ -51,8 +51,8 @@ Extern functions are called with `call.ext` / `call.ext.void`. The assembler ver
 
 ```
 .section data
-    .str  name  "string value"
-    .i64  name  integer_value
+    .str name "string value"
+    .i64 name integer_value
 ```
 
 `.str` stores a null-terminated UTF-8 string. Escape sequences: `\n \t \r \0 \\ \"`.
@@ -87,10 +87,11 @@ There is no `.f64` data directive - float immediates are written inline in code 
 **Local registers** are declared at the top of the body, before any instructions. A register declaration is just a type followed by a name:
 
 ```
-int   r0
+int r0
 float r1
-ptr   buf
-char  ch
+ptr buf
+char ch
+bool flag
 ```
 
 All registers must be declared before use. The assembler rejects references to undeclared names.
@@ -100,7 +101,7 @@ All registers must be declared before use. The assembler rejects references to u
 ```
 loop
     add r0, r0, r1
-    lt  r2, r0, r3
+    lt r2, r0, r3
     jmpif r2, loop
 ```
 
@@ -110,12 +111,13 @@ Labels are local to their function. Two functions may use the same label name.
 
 ### Types
 
-| Type    | Size     | Holds |
-|---------|----------|-------|
-| `int`   | 64-bit   | signed integer |
-| `float` | 64-bit   | IEEE 754 double |
-| `char`  | 32-bit   | Unicode scalar value |
-| `ptr`   | 64-bit   | heap pointer or data-section address |
-| `void`  | -        | return type only; no register may have this type |
+| Type | Size | Holds |
+|---|---|---|
+| `int` | 64-bit | signed integer |
+| `bool` | 64-bit | boolean (0/1), alias for `int` |
+| `float` | 64-bit | IEEE 754 double |
+| `char` | 32-bit | Unicode scalar value |
+| `ptr` | 64-bit | heap pointer or data-section address |
+| `void` | - | return type only; no register may have this type |
 
 All registers are stored as 64-bit slots internally. The type is a compile-time annotation only.
