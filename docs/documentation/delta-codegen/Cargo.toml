@@ -1,0 +1,10 @@
+[package]
+name = "delta-codegen"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+delta-asm = { workspace = true }
+delta-format = { workspace = true }

@@ -1,0 +1,11 @@
+[package]
+name = "delta-asm"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "delta_asm"
+path = "src/lib.rs"
+
+[dev-dependencies]
+delta-format = { path = "../delta-format" }

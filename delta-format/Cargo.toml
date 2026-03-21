@@ -1,0 +1,8 @@
+[package]
+name = "delta-format"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "delta_format"
+path = "src/lib.rs"

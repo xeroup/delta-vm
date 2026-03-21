@@ -1,0 +1,23 @@
+[workspace]
+members = [
+    "delta-asm",
+    "delta-format",
+    "delta-codegen",
+    "delta-cranelift",
+    "tools/das",
+    "tools/dvm",
+    "tools/installer",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Delta VM contributors"]
+license = "GPL-3.0-only"
+
+[workspace.dependencies]
+delta-format = { path = "delta-format" }
+delta-asm = { path = "delta-asm" }
+delta-codegen = { path = "delta-codegen" }
+delta-cranelift = { path = "delta-cranelift" }

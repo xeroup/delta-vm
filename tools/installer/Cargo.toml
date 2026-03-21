@@ -1,0 +1,4 @@
+[package]
+name = "installer"
+version.workspace = true
+edition.workspace = true

@@ -1,0 +1,9 @@
+[package]
+name = "das"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+delta-format = { workspace = true }
+delta-asm = { workspace = true }
+delta-codegen = { workspace = true }
